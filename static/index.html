@@ -1,0 +1,162 @@
+  <!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Irrigo</title>
+
+<!-- PWA -->
+<link rel="manifest" href="/static/manifest.json">
+<link rel="apple-touch-icon" href="/static/icon-192.png">
+<meta name="theme-color" content="#2e7d32">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+
+<style>
+
+body {
+margin: 0;
+font-family: Arial, sans-serif;
+background: linear-gradient(#2e7d32, #66bb6a);
+color: #1b5e20;
+text-align: center;
+}
+
+header {
+padding: 20px;
+font-size: 28px;
+font-weight: bold;
+color: white;
+}
+
+.container {
+padding: 15px;
+}
+
+.grid {
+display: grid;
+grid-template-columns: 1fr 1fr;
+gap: 15px;
+}
+
+.card {
+background: #f5f5f5;
+border-radius: 15px;
+padding: 20px;
+box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
+
+.label {
+font-size: 18px;
+}
+
+.value {
+font-size: 28px;
+font-weight: bold;
+margin-top: 10px;
+}
+
+.valve-card {
+margin-top: 20px;
+padding: 20px;
+background: #f5f5f5;
+border-radius: 15px;
+}
+
+button {
+margin-top: 15px;
+padding: 12px 25px;
+border: none;
+border-radius: 10px;
+background: #2e7d32;
+color: white;
+font-size: 16px;
+}
+
+</style>
+</head>
+
+<body>
+
+<header>🌱 Irrigo</header>
+
+<div class="container">
+
+<div class="grid">
+
+<div class="card">
+<div class="label">🌡 Temperature</div>
+<div id="temperature" class="value">No data</div>
+</div>
+
+<div class="card">
+<div class="label">💧 Humidity</div>
+<div id="humidity" class="value">No data</div>
+</div>
+
+<div class="card">
+<div class="label">🌿 Soil</div>
+<div id="soil" class="value">No data</div>
+</div>
+
+<div class="card">
+<div class="label">🚰 Tank</div>
+<div id="tank" class="value">No data</div>
+</div>
+
+</div>
+
+<div class="valve-card">
+<div class="label">
+Valve : <span id="valve">OFF</span>
+</div>
+
+<button onclick="toggleValve()">Toggle Valve</button>
+</div>
+
+</div>
+
+<script>
+
+async function loadData() {
+const res = await fetch("/data");
+const data = await res.json();
+
+document.getElementById("temperature").innerText =
+data.temperature ?? "No data";
+
+document.getElementById("humidity").innerText =
+data.humidity ?? "No data";
+
+document.getElementById("soil").innerText =
+data.soil ?? "No data";
+
+document.getElementById("tank").innerText =
+data.tank ?? "No data";
+
+document.getElementById("valve").innerText =
+data.valve ? "ON" : "OFF";
+}
+
+async function toggleValve() {
+await fetch("/toggle_valve", { method: "POST" });
+loadData();
+}
+
+loadData();
+setInterval(loadData, 2000);
+
+
+/* SERVICE WORKER */
+if ("serviceWorker" in navigator) {
+navigator.serviceWorker
+.register("/static/service-worker.js")
+.then(() => console.log("Service Worker OK"))
+.catch(err => console.log("Service Worker Error:", err));
+}
+
+</script>
+
+</body>
+</html>
