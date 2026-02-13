@@ -40,8 +40,6 @@ client.on_message = on_message
 
 client.connect(MQTT_BROKER, MQTT_PORT, 60)
 client.loop_start()
-
-
 @app.get("/data")
 def get_data():
   return data

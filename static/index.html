@@ -1,4 +1,4 @@
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="fr">
 <head>
 <meta charset="UTF-8" />
@@ -175,7 +175,7 @@ header h1{ font-size: 34px; }
 <script>
 async function loadData() {
 try {
-const res = await fetch("/data", { cache: "no-store" });
+const res = await fetch("https://irrigo-lwpg.onrender.com/data", { cache: "no-store" });
 const data = await res.json();
 
 document.getElementById("tempValue").textContent = (data.temperature ?? "--");
