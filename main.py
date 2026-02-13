@@ -1,4 +1,4 @@
- from fastapi import FastAPI
+from fastapi import FastAPI
 import json
 import paho.mqtt.client as mqtt
 
