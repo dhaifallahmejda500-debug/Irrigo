@@ -1,37 +1,25 @@
-const el = (id) => document.getElementById(id);
-
-function setOnlineStatus() {
-el("status").textContent = navigator.onLine ? "Status: ONLINE ✅" : "Status: OFFLINE ❌";
-}
-
-async function loadData() {
+ async function loadData() {
 try {
-const r = await fetch("/data", { cache: "no-store" });
-if (!r.ok) throw new Error("HTTP " + r.status);
-const d = await r.json();
+const res = await fetch("/data");
+const data = await res.json();
 
-el("t").textContent = d.temperature ?? "No data";
-el("h").textContent = d.humidity ?? "No data";
-el("s").textContent = d.soil ?? "No data";
-el("k").textContent = d.tank ?? "No data";
-el("v").textContent = d.valve ? "ON" : "OFF";
+document.getElementById("temperature").innerText =
+data.temperature ?? "--";
+
+document.getElementById("humidity").innerText =
+data.humidity ?? "--";
+
+document.getElementById("soil").innerText =
+data.soil ?? "--";
+
+document.getElementById("tank").innerText =
+data.tank ?? "--";
+
+document.getElementById("status").innerText = "Online";
 } catch (e) {
-console.log("fetch error", e);
+document.getElementById("status").innerText = "Offline";
 }
 }
 
-window.addEventListener("online", setOnlineStatus);
-window.addEventListener("offline", setOnlineStatus);
-
-document.addEventListener("DOMContentLoaded", () => {
-setOnlineStatus();
 loadData();
-setInterval(loadData, 3000);
-
-const btn = document.getElementById("refresh");
-if (btn) btn.addEventListener("click", loadData);
-
-if ("serviceWorker" in navigator) {
-navigator.serviceWorker.register("/static/service-worker.js");
-}
-});
+setInterval(loadData, 2000);
