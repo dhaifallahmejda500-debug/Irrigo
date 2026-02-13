@@ -1,54 +1,27 @@
- const CACHE_NAME = "irrigio-cache-v1";
-
+ const CACHE = "irrigo-v1";
 const ASSETS = [
 "/",
 "/static/index.html",
-"/static/manifest.json",
-"/static/service-worker.js",
-"/static/icon-192.png",
-"/static/icon-512.png"
+"/static/app.js",
+"/static/manifest.json"
 ];
 
-// Install
-self.addEventListener("install", (event) => {
-event.waitUntil(
-caches.open(CACHE_NAME).then((cache) => cache.addAll(ASSETS))
-);
+self.addEventListener("install", (e) => {
+e.waitUntil(caches.open(CACHE).then((c) => c.addAll(ASSETS)));
 });
 
-// Activate
-self.addEventListener("activate", (event) => {
-event.waitUntil(
-caches.keys().then((keys) =>
-Promise.all(keys.map((k) => (k !== CACHE_NAME ? caches.delete(k) : null)))
-)
-);
-});
+self.addEventListener("fetch", (e) => {
+const url = new URL(e.request.url);
 
-// Fetch
-self.addEventListener("fetch", (event) => {
-const url = new URL(event.request.url);
-
-// Ne pas mettre /data en cache (car dynamique)
+// /data = toujours réseau (sinon tu gardes de vieilles valeurs)
 if (url.pathname === "/data") {
-event.respondWith(
-fetch(event.request).catch(() =>
-new Response(JSON.stringify({
-temperature: null,
-humidity: null,
-soil: null,
-tank: null,
-valve: false,
-online: false,
-seconds_since_update: null
-}), { headers: { "Content-Type": "application/json" } })
-)
-);
+e.respondWith(fetch(e.request).catch(() => new Response(JSON.stringify({
+temperature: null, humidity: null, soil: null, tank: null, valve: false
+}), { headers: { "Content-Type": "application/json" } })));
 return;
 }
 
-// Cache first pour le reste
-event.respondWith(
-caches.match(event.request).then((cached) => cached || fetch(event.request))
+e.respondWith(
+caches.match(e.request).then((r) => r || fetch(e.request))
 );
 });
