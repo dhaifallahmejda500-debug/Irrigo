@@ -1,6 +1,6 @@
- const CACHE_NAME = "irrigo-cache-v1";
+ const CACHE_NAME = "irrigio-cache-v1";
 
-const FILES_TO_CACHE = [
+const ASSETS = [
 "/",
 "/static/index.html",
 "/static/manifest.json",
@@ -9,24 +9,46 @@ const FILES_TO_CACHE = [
 "/static/icon-512.png"
 ];
 
+// Install
 self.addEventListener("install", (event) => {
 event.waitUntil(
-caches.open(CACHE_NAME).then((cache) => cache.addAll(FILES_TO_CACHE))
+caches.open(CACHE_NAME).then((cache) => cache.addAll(ASSETS))
 );
-self.skipWaiting();
 });
 
+// Activate
 self.addEventListener("activate", (event) => {
 event.waitUntil(
 caches.keys().then((keys) =>
 Promise.all(keys.map((k) => (k !== CACHE_NAME ? caches.delete(k) : null)))
 )
 );
-self.clients.claim();
 });
 
+// Fetch
 self.addEventListener("fetch", (event) => {
+const url = new URL(event.request.url);
+
+// Ne pas mettre /data en cache (car dynamique)
+if (url.pathname === "/data") {
 event.respondWith(
-caches.match(event.request).then((resp) => resp || fetch(event.request))
+fetch(event.request).catch(() =>
+new Response(JSON.stringify({
+temperature: null,
+humidity: null,
+soil: null,
+tank: null,
+valve: false,
+online: false,
+seconds_since_update: null
+}), { headers: { "Content-Type": "application/json" } })
+)
+);
+return;
+}
+
+// Cache first pour le reste
+event.respondWith(
+caches.match(event.request).then((cached) => cached || fetch(event.request))
 );
 });

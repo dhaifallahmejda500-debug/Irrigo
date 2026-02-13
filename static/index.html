@@ -1,142 +1,206 @@
-  <!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Irrigo</title>
 
-<!-- PWA -->
+<meta name="theme-color" content="#2e7d32">
 <link rel="manifest" href="/static/manifest.json">
 <link rel="apple-touch-icon" href="/static/icon-192.png">
-<meta name="theme-color" content="#2e7d32">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black">
 
 <style>
-
-body {
-margin: 0;
+body{
+margin:0;
 font-family: Arial, sans-serif;
-background: linear-gradient(#2e7d32, #66bb6a);
-color: #1b5e20;
-text-align: center;
+background: linear-gradient(#2e7d32, #4caf50);
+color:#1b5e20;
+min-height: 100vh;
+display:flex;
+justify-content:center;
+align-items:flex-start;
+padding: 20px 0;
 }
 
-header {
-padding: 20px;
-font-size: 28px;
-font-weight: bold;
-color: white;
+.container{
+width: min(920px, 92vw);
+text-align:center;
 }
 
-.container {
-padding: 15px;
+header{
+margin: 10px 0 18px 0;
+color:#fff;
 }
 
-.grid {
-display: grid;
-grid-template-columns: 1fr 1fr;
-gap: 15px;
+header h1{
+margin: 0;
+font-size: 40px;
+font-weight: 800;
+letter-spacing: 0.5px;
+display:flex;
+gap: 10px;
+justify-content:center;
+align-items:center;
 }
 
-.card {
-background: #f5f5f5;
-border-radius: 15px;
-padding: 20px;
-box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+.status-badge{
+display:inline-block;
+margin-top:8px;
+padding:6px 12px;
+border-radius:999px;
+font-weight:700;
+font-size:14px;
+background:#ffffff33;
+color:#fff;
+}
+.status-badge.online{
+background:rgba(0, 160, 70, 0.35);
+border:1px solid rgba(0, 255, 120, 0.4);
+}
+.status-badge.offline{
+background:rgba(200, 0, 0, 0.25);
+border:1px solid rgba(255, 80, 80, 0.35);
 }
 
-.label {
+.grid{
+display:grid;
+grid-template-columns: repeat(2, 1fr);
+gap: 18px;
+}
+
+.card{
+background: #fff;
+border-radius: 18px;
+padding: 22px 20px;
+box-shadow: 0 10px 24px rgba(0,0,0,0.18);
+text-align:left;
+min-height: 110px;
+display:flex;
+flex-direction:column;
+justify-content:center;
+}
+
+.label{
 font-size: 18px;
+color:#2e7d32;
+display:flex;
+align-items:center;
+gap: 10px;
+justify-content:flex-start;
 }
 
-.value {
-font-size: 28px;
-font-weight: bold;
+.value{
 margin-top: 10px;
+font-size: 44px;
+font-weight: 800;
+color:#1b5e20;
 }
 
-.valve-card {
+.bottom{
 margin-top: 20px;
+background:#fff;
+border-radius: 18px;
 padding: 20px;
-background: #f5f5f5;
-border-radius: 15px;
+box-shadow: 0 10px 24px rgba(0,0,0,0.18);
 }
 
-button {
-margin-top: 15px;
-padding: 12px 25px;
-border: none;
-border-radius: 10px;
+.valve-line{
+font-size: 22px;
+font-weight: 700;
+margin-bottom: 16px;
+color:#1b5e20;
+}
+
+.btn{
+display:inline-block;
+border:none;
+cursor:pointer;
+padding: 14px 22px;
+font-size: 18px;
+font-weight: 800;
+border-radius: 12px;
 background: #2e7d32;
-color: white;
-font-size: 16px;
+color:#fff;
+transition: transform .06s ease;
+}
+.btn:active{
+transform: scale(0.98);
 }
 
+@media (max-width: 560px){
+.grid{ grid-template-columns: 1fr; }
+header h1{ font-size: 34px; }
+.value{ font-size: 40px; }
+}
 </style>
 </head>
 
 <body>
-
-<header>🌱 Irrigo</header>
-
 <div class="container">
+<header>
+<h1>🌱 Irrigo</h1>
+<div id="statusBadge" class="status-badge offline">🔴 Offline</div>
+</header>
 
 <div class="grid">
-
 <div class="card">
-<div class="label">🌡 Temperature</div>
-<div id="temperature" class="value">No data</div>
+<div class="label">🌡️ Temperature</div>
+<div class="value" id="tempValue">--</div>
 </div>
 
 <div class="card">
 <div class="label">💧 Humidity</div>
-<div id="humidity" class="value">No data</div>
+<div class="value" id="humValue">--</div>
 </div>
 
 <div class="card">
 <div class="label">🌿 Soil</div>
-<div id="soil" class="value">No data</div>
+<div class="value" id="soilValue">--</div>
 </div>
 
 <div class="card">
 <div class="label">🚰 Tank</div>
-<div id="tank" class="value">No data</div>
+<div class="value" id="tankValue">--</div>
+</div>
 </div>
 
+<div class="bottom">
+<div class="valve-line">Valve : <span id="valveStatus">OFF</span></div>
+<button class="btn" onclick="toggleValve()">Toggle Valve</button>
 </div>
-
-<div class="valve-card">
-<div class="label">
-Valve : <span id="valve">OFF</span>
-</div>
-
-<button onclick="toggleValve()">Toggle Valve</button>
-</div>
-
 </div>
 
 <script>
-
 async function loadData() {
-const res = await fetch("/data");
+try {
+const res = await fetch("/data", { cache: "no-store" });
 const data = await res.json();
 
-document.getElementById("temperature").innerText =
-data.temperature ?? "No data";
+document.getElementById("tempValue").textContent = (data.temperature ?? "--");
+document.getElementById("humValue").textContent = (data.humidity ?? "--");
+document.getElementById("soilValue").textContent = (data.soil ?? "--");
+document.getElementById("tankValue").textContent = (data.tank ?? "--");
+document.getElementById("valveStatus").textContent = data.valve ? "ON" : "OFF";
 
-document.getElementById("humidity").innerText =
-data.humidity ?? "No data";
+const badge = document.getElementById("statusBadge");
+if (data.online) {
+badge.classList.remove("offline");
+badge.classList.add("online");
+badge.textContent = "🟢 Online";
+} else {
+badge.classList.remove("online");
+badge.classList.add("offline");
+badge.textContent = "🔴 Offline";
+}
 
-document.getElementById("soil").innerText =
-data.soil ?? "No data";
-
-document.getElementById("tank").innerText =
-data.tank ?? "No data";
-
-document.getElementById("valve").innerText =
-data.valve ? "ON" : "OFF";
+} catch (e) {
+const badge = document.getElementById("statusBadge");
+badge.classList.remove("online");
+badge.classList.add("offline");
+badge.textContent = "🔴 Offline";
+}
 }
 
 async function toggleValve() {
@@ -147,16 +211,12 @@ loadData();
 loadData();
 setInterval(loadData, 2000);
 
-
-/* SERVICE WORKER */
+// Service worker register
 if ("serviceWorker" in navigator) {
-navigator.serviceWorker
-.register("/static/service-worker.js")
+navigator.serviceWorker.register("/static/service-worker.js")
 .then(() => console.log("Service Worker OK"))
-.catch(err => console.log("Service Worker Error:", err));
+.catch((err) => console.log("Service Worker Error:", err));
 }
-
 </script>
-
 </body>
 </html>
