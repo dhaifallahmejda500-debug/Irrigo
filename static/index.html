@@ -1,223 +1,334 @@
-<!DOCTYPE html>
+ <!doctype html>
 <html lang="fr">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>Irrigo</title>
 
-<meta name="theme-color" content="#2e7d32">
 <link rel="manifest" href="/static/manifest.json">
-<link rel="apple-touch-icon" href="/static/icon-192.png">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="theme-color" content="#20c997">
 
 <style>
+:root{
+--bg1:#2c7a2c;
+--bg2:#1f9d6c;
+--card:#ffffff;
+--muted:#6b7280;
+--btn:#2f7d32;
+--danger:#e74c3c;
+--ok:#2ecc71;
+--shadow: 0 10px 25px rgba(0,0,0,.15);
+--radius:18px;
+font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+}
 body{
 margin:0;
-font-family: Arial, sans-serif;
-background: linear-gradient(#2e7d32, #4caf50);
-color:#1b5e20;
-min-height: 100vh;
+background: linear-gradient(135deg,var(--bg1),var(--bg2));
+min-height:100vh;
 display:flex;
-justify-content:center;
-align-items:flex-start;
-padding: 20px 0;
-}
-
-.container{
-width: min(920px, 92vw);
-text-align:center;
-}
-
-header{
-margin: 10px 0 18px 0;
-color:#fff;
-}
-
-header h1{
-margin: 0;
-font-size: 40px;
-font-weight: 800;
-letter-spacing: 0.5px;
-display:flex;
-gap: 10px;
 justify-content:center;
 align-items:center;
+padding:16px;
 }
-
-.status-badge{
-display:inline-block;
-margin-top:8px;
-padding:6px 12px;
-border-radius:999px;
-font-weight:700;
-font-size:14px;
-background:#ffffff33;
-color:#fff;
+.app{
+width: min(420px, 96vw);
+background: rgba(255,255,255,.12);
+border-radius: 26px;
+padding: 14px 14px 78px;
+box-shadow: var(--shadow);
+position:relative;
+overflow:hidden;
 }
-.status-badge.online{
-background:rgba(0, 160, 70, 0.35);
-border:1px solid rgba(0, 255, 120, 0.4);
+.header{
+display:flex; flex-direction:column; align-items:center;
+color:white; padding:12px 8px 8px;
 }
-.status-badge.offline{
-background:rgba(200, 0, 0, 0.25);
-border:1px solid rgba(255, 80, 80, 0.35);
+.logo{
+display:flex; gap:10px; align-items:center;
+font-size:34px; font-weight:800; letter-spacing:.5px;
 }
-
+.badge{
+margin-top:6px;
+padding:6px 14px; border-radius:999px;
+font-size:14px; font-weight:700;
+display:inline-flex; align-items:center; gap:8px;
+background:rgba(0,0,0,.22);
+}
+.dot{ width:10px;height:10px;border-radius:50%; background: var(--danger); }
+.badge.online .dot{ background: var(--ok); }
+.panel{
+background: rgba(255,255,255,.14);
+border-radius: 22px;
+padding: 14px;
+margin-top: 8px;
+}
 .grid{
 display:grid;
-grid-template-columns: repeat(2, 1fr);
-gap: 18px;
+grid-template-columns: 1fr 1fr;
+gap:12px;
 }
-
 .card{
-background: #fff;
-border-radius: 18px;
-padding: 22px 20px;
-box-shadow: 0 10px 24px rgba(0,0,0,0.18);
-text-align:left;
-min-height: 110px;
-display:flex;
-flex-direction:column;
-justify-content:center;
+background: var(--card);
+border-radius: var(--radius);
+padding: 14px;
+min-height: 84px;
+box-shadow: var(--shadow);
+display:flex; flex-direction:column; justify-content:space-between;
 }
-
 .label{
-font-size: 18px;
-color:#2e7d32;
-display:flex;
-align-items:center;
-gap: 10px;
-justify-content:flex-start;
+font-size:14px; color: var(--muted); font-weight:700;
+display:flex; align-items:center; gap:8px;
 }
-
 .value{
-margin-top: 10px;
-font-size: 44px;
-font-weight: 800;
-color:#1b5e20;
+font-size:40px; font-weight:900; color:#1f2937;
+line-height:1;
 }
-
-.bottom{
-margin-top: 20px;
-background:#fff;
-border-radius: 18px;
-padding: 20px;
-box-shadow: 0 10px 24px rgba(0,0,0,0.18);
+.bigCard{
+margin-top:12px;
+background: var(--card);
+border-radius: var(--radius);
+padding: 14px;
+box-shadow: var(--shadow);
+display:flex; flex-direction:column; gap:12px;
+align-items:center;
 }
-
-.valve-line{
-font-size: 22px;
-font-weight: 700;
-margin-bottom: 16px;
-color:#1b5e20;
+.bigRow{
+width:100%;
+display:flex; justify-content:center; align-items:center;
+font-weight:900; color:#1f2937; font-size:22px;
 }
-
 .btn{
-display:inline-block;
 border:none;
+background: var(--btn);
+color:white;
+padding: 12px 18px;
+border-radius: 14px;
+font-weight:800;
 cursor:pointer;
-padding: 14px 22px;
-font-size: 18px;
-font-weight: 800;
-border-radius: 12px;
-background: #2e7d32;
-color:#fff;
-transition: transform .06s ease;
+width: 180px;
 }
-.btn:active{
-transform: scale(0.98);
+.btn.secondary{
+background:#0ea5e9;
+}
+.tabs{
+display:flex; gap:10px; justify-content:center; margin-bottom:10px;
+}
+.tab{
+border:none; cursor:pointer;
+padding:10px 14px;
+border-radius:999px;
+background: rgba(255,255,255,.35);
+font-weight:900;
+color:#0f172a;
+min-width:105px;
+}
+.tab.active{ background:#20c997; color:white; }
+.sectionTitle{
+color:white; font-weight:900; font-size:26px;
+margin: 8px 0 12px;
 }
 
-@media (max-width: 560px){
-.grid{ grid-template-columns: 1fr; }
-header h1{ font-size: 34px; }
-.value{ font-size: 40px; }
+.rowCard{
+background: rgba(255,255,255,.9);
+border-radius: 20px;
+padding: 18px;
+display:flex; align-items:center; justify-content:space-between;
+box-shadow: var(--shadow);
+margin-bottom:12px;
+gap:12px;
 }
+.rowCard .name{
+font-weight:900; font-size:22px; color:#334155;
+}
+.switch{
+width:56px; height:32px;
+background:#cbd5e1;
+border-radius:999px;
+position:relative; cursor:pointer;
+}
+.switch.on{ background:#20c997; }
+.knob{
+width:26px; height:26px;
+background:white; border-radius:50%;
+position:absolute; top:3px; left:3px;
+transition:.2s;
+}
+.switch.on .knob{ left:27px; }
+
+.form{
+background: rgba(255,255,255,.92);
+border-radius: 22px;
+padding: 16px;
+box-shadow: var(--shadow);
+}
+.form label{ font-weight:800; color:#334155; display:block; margin-top:10px; }
+.form select, .form input{
+width:100%; padding:12px; margin-top:6px;
+border-radius:14px; border:1px solid #e5e7eb;
+font-weight:700;
+}
+.timerItem{
+margin-top:12px;
+background: rgba(255,255,255,.92);
+border-radius: 18px;
+padding: 14px;
+display:flex; justify-content:space-between; align-items:center;
+box-shadow: var(--shadow);
+}
+.timerItem .meta{ font-weight:800; color:#334155; }
+.xbtn{
+border:none; background:transparent; font-size:26px; cursor:pointer;
+color:#ef4444; font-weight:900;
+}
+
+.nav{
+position:absolute; left:0; right:0; bottom:0;
+height:66px;
+background: rgba(255,255,255,.92);
+display:flex; justify-content:space-around; align-items:center;
+border-top-left-radius: 26px;
+border-top-right-radius: 26px;
+box-shadow: 0 -10px 25px rgba(0,0,0,.12);
+}
+.nav button{
+border:none; background:transparent; cursor:pointer;
+font-weight:900; color:#334155;
+display:flex; flex-direction:column; align-items:center; gap:4px;
+}
+.nav button.active{ color:#20c997; }
+.small{ font-size:12px; }
+.hidden{ display:none; }
 </style>
 </head>
 
 <body>
-<div class="container">
-<header>
-<h1>🌱 Irrigo</h1>
-<div id="statusBadge" class="status-badge offline">🔴 Offline</div>
-</header>
+<div class="app">
+<div class="header">
+<div class="logo">🌱 <span>Irrigo</span></div>
+<div id="statusBadge" class="badge offline">
+<span class="dot"></span><span id="statusText">Offline</span>
+</div>
+</div>
 
+<!-- HOME -->
+<div id="pageHome">
+<div class="panel">
 <div class="grid">
 <div class="card">
 <div class="label">🌡️ Temperature</div>
-<div class="value" id="tempValue">--</div>
+<div id="tempVal" class="value">--</div>
 </div>
-
 <div class="card">
 <div class="label">💧 Humidity</div>
-<div class="value" id="humValue">--</div>
+<div id="humVal" class="value">--</div>
 </div>
-
 <div class="card">
 <div class="label">🌿 Soil</div>
-<div class="value" id="soilValue">--</div>
+<div id="soilVal" class="value">--</div>
 </div>
-
 <div class="card">
-<div class="label">🚰 Tank</div>
-<div class="value" id="tankValue">--</div>
+<div class="label">🛢️ Tank</div>
+<div id="tankVal" class="value">--</div>
 </div>
 </div>
 
-<div class="bottom">
-<div class="valve-line">Valve : <span id="valveStatus">OFF</span></div>
-<button class="btn" onclick="toggleValve()">Toggle Valve</button>
+<div class="bigCard">
+<div class="bigRow">Valve : <span id="valveText" style="margin-left:10px;">OFF</span></div>
+<button class="btn" id="btnValve">Toggle Valve</button>
+<button class="btn secondary" id="btnMotor">Toggle Tank motor</button>
+</div>
+</div>
+</div>
+
+<!-- IRRIGATE -->
+<div id="pageIrrigate" class="hidden">
+<div class="sectionTitle">Irrigate</div>
+
+<div class="tabs">
+<button class="tab active" id="tabManual">Manuel</button>
+<button class="tab" id="tabAuto">Automatic</button>
+<button class="tab" id="tabSmart">Smart</button>
+</div>
+
+<!-- MANUAL -->
+<div id="manualBox">
+<div class="rowCard">
+<div class="name">Tank motor</div>
+<div id="swMotor" class="switch"><div class="knob"></div></div>
+</div>
+<div class="rowCard">
+<div class="name">Valve 1</div>
+<div id="swValve" class="switch"><div class="knob"></div></div>
 </div>
 </div>
 
-<script>
-async function loadData() {
-try {
-const res = await fetch("https://irrigo-lwpg.onrender.com/data", { cache: "no-store" });
-const data = await res.json();
+<!-- AUTO -->
+<div id="autoBox" class="hidden">
+<div class="form">
+<label>Device</label>
+<select id="timerDevice">
+<option value="valve">Valve 1</option>
+<option value="motor">Tank motor</option>
+</select>
 
-document.getElementById("tempValue").textContent = (data.temperature ?? "--");
-document.getElementById("humValue").textContent = (data.humidity ?? "--");
-document.getElementById("soilValue").textContent = (data.soil ?? "--");
-document.getElementById("tankValue").textContent = (data.tank ?? "--");
-document.getElementById("valveStatus").textContent = data.valve ? "ON" : "OFF";
+<label>From</label>
+<input id="timerFrom" type="datetime-local"/>
 
-const badge = document.getElementById("statusBadge");
-if (data.online) {
-badge.classList.remove("offline");
-badge.classList.add("online");
-badge.textContent = "🟢 Online";
-} else {
-badge.classList.remove("online");
-badge.classList.add("offline");
-badge.textContent = "🔴 Offline";
-}
+<label>To</label>
+<input id="timerTo" type="datetime-local"/>
 
-} catch (e) {
-const badge = document.getElementById("statusBadge");
-badge.classList.remove("online");
-badge.classList.add("offline");
-badge.textContent = "🔴 Offline";
-}
-}
+<div style="margin-top:14px; display:flex; justify-content:center;">
+<button class="btn" id="addTimerBtn">Add</button>
+</div>
+</div>
 
-async function toggleValve() {
-await fetch("/toggle_valve", { method: "POST" });
-loadData();
-}
+<div class="sectionTitle" style="font-size:22px;">Timer List</div>
+<div id="timerList"></div>
+</div>
 
-loadData();
-setInterval(loadData, 2000);
+<!-- SMART -->
+<div id="smartBox" class="hidden">
+<div class="form">
+<label>Smart enabled</label>
+<div style="display:flex; justify-content:space-between; align-items:center; margin-top:8px;">
+<div style="font-weight:900;">Mode Smart</div>
+<div id="swSmart" class="switch"><div class="knob"></div></div>
+</div>
 
-// Service worker register
-if ("serviceWorker" in navigator) {
-navigator.serviceWorker.register("/static/service-worker.js")
-.then(() => console.log("Service Worker OK"))
-.catch((err) => console.log("Service Worker Error:", err));
-}
-</script>
-<script src="/static/app.js"> </script>
+<label>Soil threshold (%)</label>
+<input id="soilThreshold" type="number" min="0" max="100" value="30"/>
+
+<label>Min ON seconds</label>
+<input id="minOn" type="number" min="5" max="600" value="20"/>
+
+<div style="margin-top:14px; display:flex; justify-content:center;">
+<button class="btn" id="saveSmartBtn">Save</button>
+</div>
+</div>
+</div>
+</div>
+
+<!-- SETTINGS -->
+<div id="pageSettings" class="hidden">
+<div class="sectionTitle">Settings</div>
+<div class="form">
+<div style="font-weight:900;">PWA / Offline</div>
+<div style="margin-top:8px;color:#334155;font-weight:700;">
+- Ouvre l’app dans Chrome<br/>
+- Menu ⋮ → <b>Add to Home screen</b><br/>
+- L’app marche offline (cache)
+</div>
+</div>
+</div>
+
+<!-- NAV -->
+<div class="nav">
+<button id="navHome" class="active">🏠 <span class="small">Home</span></button>
+<button id="navIrrigate">🛰️ <span class="small">Irrigate</span></button>
+<button id="navSettings">⚙️ <span class="small">Settings</span></button>
+</div>
+</div>
+
+<script src="/static/app.js"></script>
 </body>
 </html>

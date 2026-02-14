@@ -1,12 +1,20 @@
-{
-"name": "Smart Irrigation",
-"short_name": "Irrigation",
+ {
+"name": "Irrigo",
+"short_name": "Irrigo",
 "start_url": "/",
 "display": "standalone",
-"background_color": "#ffffff",
-"theme_color": "#ffffff",
+"background_color": "#20c997",
+"theme_color": "#20c997",
 "icons": [
-{ "src": "/static/icon-192.png", "sizes": "192x192", "type": "image/png" },
-{ "src": "/static/icon-512.png", "sizes": "512x512", "type": "image/png" }
+{
+"src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAAKklEQVR4nO3BMQEAAADCoPVPbQ0PoAAAAAAAAAAAAAAAAAAAAAAA4G0E0AABs6fVbQAAAABJRU5ErkJggg==",
+"sizes": "192x192",
+"type": "image/png"
+},
+{
+"src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAAKklEQVR4nO3BMQEAAADCoPVPbQ0PoAAAAAAAAAAAAAAAAAAAAAAA4G0E0AABs6fVbQAAAABJRU5ErkJggg==",
+"sizes": "512x512",
+"type": "image/png"
+}
 ]
 }
