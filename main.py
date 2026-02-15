@@ -16,7 +16,7 @@ import paho.mqtt.client as mqtt
 # -----------------------------
 MQTT_HOST = os.getenv("MQTT_HOST", "test.mosquitto.org")
 MQTT_PORT = int(os.getenv("MQTT_PORT", "1883"))
-MQTT_USER = os.getenv("MQTT_USER", "").strip()
+MQTT_USER = os.getenv("MQTT_USER", "").strip()   
 MQTT_PASS = os.getenv("MQTT_PASS", "").strip()
 MQTT_TOPIC_DATA = os.getenv("MQTT_TOPIC_DATA", "irrigo/data")
 MQTT_TOPIC_CMD = os.getenv("MQTT_TOPIC_CMD", "irrigo/cmd")
@@ -27,6 +27,7 @@ CORS_ORIGINS = os.getenv("CORS_ORIGINS", "*")
 # APP
 # -----------------------------
 app = FastAPI(title="Irrigo API", version="1.0.0")
+app=FastAPI()
 
 app.add_middleware(
    CORSMiddleware,
@@ -264,6 +265,9 @@ def get_smart():
            "soil_threshold": smart_soil_threshold,
            "min_on_seconds": smart_min_on_seconds,
 }
+@app.get("/")
+def read_root():
+   return{"status":"irrigo ok"}
 
 @app.post("/smart")
 def set_smart(body: Dict[str, Any]):
