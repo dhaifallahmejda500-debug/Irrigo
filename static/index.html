@@ -1,191 +1,58 @@
- <!doctype html>
-<html lang="fr">
+ !DOCTYPE html>
+<html>
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
 <title>Irrigo</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
 
-<link rel="manifest" href="/static/manifest.json">
-<meta name="theme-color" content="#22e6a7">
-<link rel="icon" href="/static/icon-192.png">
+<style>
+body {
+font-family: Arial;
+background: linear-gradient(135deg,#4facfe,#00f2fe);
+color: white;
+text-align: center;
+}
 
-<link rel="stylesheet" href="/static/style.css" />
+.card {
+background: white;
+color: black;
+margin: 20px;
+padding: 20px;
+border-radius: 20px;
+}
+
+button {
+padding: 15px;
+border: none;
+border-radius: 10px;
+background: #00c896;
+color: white;
+font-size: 16px;
+}
+</style>
 </head>
 
 <body>
-<div class="app">
-<header class="topbar">
-<div class="brand">
-<span class="logo">RayTech</span>
-<span class="dot" id="mqttDot" title="MQTT status"></span>
-</div>
-</header>
 
-<!-- HOME -->
-<section id="pageHome" class="page active">
-<div class="card big">
-<div class="grid2">
-<div class="metric green">
-<div class="metricIcon">🌡️</div>
-<div class="metricValue" id="tempVal">--</div>
-<div class="metricLabel">Temperature</div>
+<h2>RayTech Irrigation</h2>
+
+<div class="card">
+<h3>Temperature</h3>
+<h1 id="temp">--</h1>
 </div>
 
-<div class="metric cyan">
-<div class="metricIcon">💧</div>
-<div class="metricValue" id="humVal">--</div>
-<div class="metricLabel">Humidity</div>
-</div>
+<div class="card">
+<h3>Humidity</h3>
+<h1 id="hum">--</h1>
 </div>
 
-<div class="row2">
-<div class="gaugeBlock">
-<div class="gaugeTitle">Soil humidity</div>
-<div class="gauge">
-<div class="gaugeRing" id="soilRing"></div>
-<div class="gaugeText" id="soilVal">--%</div>
-</div>
+<div class="card">
+<h3>Soil</h3>
+<h1 id="soil">--</h1>
 </div>
 
-<div class="illus">🌱</div>
-</div>
-
-<div class="row2">
-<div class="gaugeBlock">
-<div class="gaugeTitle">Tank Water level</div>
-<div class="gauge">
-<div class="gaugeRing" id="tankRing"></div>
-<div class="gaugeText" id="tankVal">--%</div>
-</div>
-</div>
-
-<div class="tankText">
-<div class="small">Tank Motor is <span id="motorText" class="off">OFF</span></div>
-<div class="illus">🛢️</div>
-</div>
-</div>
-
-<div class="toggleCard">
-<div class="toggleLeft">
-<div class="status" id="valveStatus">OFF</div>
-<div class="toggleTitle">Valve</div>
-</div>
-<label class="switch">
-<input id="valveSwitch" type="checkbox">
-<span class="slider"></span>
-</label>
-</div>
-
-<button class="btn" id="btnRefreshHome">Refresh</button>
-</div>
-</section>
-
-<!-- IRRIGATE -->
-<section id="pageIrrigate" class="page">
-<div class="tabs">
-<button class="tab" data-mode="manual">Manuel</button>
-<button class="tab active" data-mode="automatic">automatic</button>
-<button class="tab" data-mode="smart">Smart</button>
-</div>
-
-<div class="card big">
-<!-- MANUAL -->
-<div class="mode" id="modeManual">
-<div class="manualItem">
-<div class="manualIcon">🚰</div>
-<div class="manualTitle">Tank motor</div>
-<label class="switch">
-<input id="motorSwitch" type="checkbox">
-<span class="slider"></span>
-</label>
-</div>
-
-<div class="manualItem">
-<div class="manualIcon">🔧</div>
-<div class="manualTitle">Valve 1</div>
-<label class="switch">
-<input id="valveSwitch2" type="checkbox">
-<span class="slider"></span>
-</label>
-</div>
-
-<button class="btn" id="btnRefreshManual">Refresh</button>
-</div>
-
-<!-- AUTOMATIC -->
-<div class="mode active" id="modeAutomatic">
-<h2 class="h2">Set Timer for Irrigation</h2>
-
-<div class="field">
-<label>Valve</label>
-<select id="timerValve">
-<option>Valve 1</option>
-</select>
-</div>
-
-<div class="field">
-<label>From</label>
-<input id="timerFrom" type="datetime-local">
-</div>
-
-<div class="field">
-<label>To</label>
-<input id="timerTo" type="datetime-local">
-</div>
-
-<button class="btn bigBtn" id="btnAddTimer">Add</button>
-
-<h3 class="h3">Timer List</h3>
-<div id="timerList" class="timerList"></div>
-</div>
-
-<!-- SMART -->
-<div class="mode" id="modeSmart">
-<h2 class="h2">Smart mode</h2>
-<p class="muted">
-Ici tu peux ajouter plus tard: seuil soil, température, règles automatiques…
-</p>
-</div>
-</div>
-</section>
-
-<!-- SETTINGS -->
-<section id="pageSettings" class="page">
-<div class="card big">
-<h2 class="h2">Settings</h2>
-<div class="kv">
-<div class="k">Backend</div>
-<div class="v" id="backendUrl">--</div>
-</div>
-<div class="kv">
-<div class="k">MQTT Host</div>
-<div class="v" id="cfgHost">--</div>
-</div>
-<div class="kv">
-<div class="k">MQTT Port</div>
-<div class="v" id="cfgPort">--</div>
-</div>
-<div class="kv">
-<div class="k">Topic data</div>
-<div class="v" id="cfgData">--</div>
-</div>
-<div class="kv">
-<div class="k">Topic cmd</div>
-<div class="v" id="cfgCmd">--</div>
-</div>
-
-<button class="btn" id="btnRefreshSettings">Refresh</button>
-</div>
-</section>
-
-<!-- Bottom nav -->
-<nav class="bottomNav">
-<button class="navBtn active" data-page="Home">🏠<span>Home</span></button>
-<button class="navBtn" data-page="Irrigate">📡<span>Irrigate</span></button>
-<button class="navBtn" data-page="Settings">⚙️<span>Settings</span></button>
-</nav>
-</div>
+<button onclick="toggleValve()">Toggle Valve</button>
 
 <script src="/static/app.js"></script>
+
 </body>
 </html>
