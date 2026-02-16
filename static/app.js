@@ -1,258 +1,213 @@
  
+ // -------------------------
+// Helpers
+// -------------------------
 const $ = (id) => document.getElementById(id);
 
-const API = {
-data: "/data",
-status: "/status",
-setValve: "/set/valve",
-setMotor: "/set/motor",
-timers: "/timers",
-smart: "/smart",
-};
-
-let current = {
-temperature: null,
-humidity: null,
-soil: null,
-tank: null,
-valve: false,
-motor: false,
-};
-
-function setText(id, val) {
-$(id).innerText = (val === null || val === undefined) ? "--" : String(val);
-}
-
-function setSwitch(sw, on) {
-if (on) sw.classList.add("on");
-else sw.classList.remove("on");
-}
-
-async function apiGet(url) {
-const r = await fetch(url);
-if (!r.ok) throw new Error("GET failed");
-return await r.json();
-}
-async function apiPost(url, body) {
-const r = await fetch(url, {
-method: "POST",
-headers: { "Content-Type":"application/json" },
-body: JSON.stringify(body),
+function setActivePage(name) {
+const pages = ["Home", "Irrigate", "Settings"];
+pages.forEach(p => {
+const el = document.getElementById("page" + p);
+el.classList.toggle("active", p === name);
 });
-if (!r.ok) throw new Error("POST failed");
+
+document.querySelectorAll(".navBtn").forEach(btn => {
+btn.classList.toggle("active", btn.dataset.page === name);
+});
+}
+
+function setGauge(el, percent) {
+const p = Math.max(0, Math.min(100, Number(percent || 0)));
+const deg = p * 3.6;
+el.style.background = `conic-gradient(var(--ok) ${deg}deg, #dbeff0 ${deg}deg)`;
+}
+
+function toLocalInputValue(date) {
+// yyyy-MM-ddTHH:mm
+const pad = (n) => String(n).padStart(2, "0");
+return `${date.getFullYear()}-${pad(date.getMonth()+1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
+}
+
+function toDisplayValue(dtLocalStr) {
+// dtLocalStr = "2026-02-08T21:36"
+return dtLocalStr.replace("T", " ");
+}
+
+// -------------------------
+// API
+// -------------------------
+async function apiGet(path) {
+const r = await fetch(path);
+if (!r.ok) throw new Error(await r.text());
 return await r.json();
 }
-async function apiDelete(url) {
-const r = await fetch(url, { method: "DELETE" });
-if (!r.ok) throw new Error("DELETE failed");
+
+async function apiPost(path, body) {
+const r = await fetch(path, {
+method: "POST",
+headers: {"Content-Type":"application/json"},
+body: JSON.stringify(body)
+});
+if (!r.ok) throw new Error(await r.text());
 return await r.json();
 }
 
-async function loadStatus() {
-try {
-const s = await apiGet(API.status);
-const badge = $("statusBadge");
-const txt = $("statusText");
-if (s.online) {
-badge.classList.add("online");
-txt.innerText = "Online";
-} else {
-badge.classList.remove("online");
-txt.innerText = "Offline";
-}
-} catch {
-$("statusBadge").classList.remove("online");
-$("statusText").innerText = "Offline";
-}
+async function apiDel(path) {
+const r = await fetch(path, {method:"DELETE"});
+if (!r.ok) throw new Error(await r.text());
+return await r.json();
 }
 
-async function loadData() {
-try {
-const d = await apiGet(API.data);
-current = d;
+// -------------------------
+// State + Refresh
+// -------------------------
+async function refreshAll() {
+const data = await apiGet("/api/dashboard");
 
-setText("tempVal", d.temperature);
-setText("humVal", d.humidity);
-setText("soilVal", d.soil);
-setText("tankVal", d.tank);
+// MQTT dot
+const dot = $("mqttDot");
+dot.style.background = data.mqtt_connected ? "#20c997" : "#ff3b30";
 
-$("valveText").innerText = d.valve ? "ON" : "OFF";
+// sensors
+const s = data.sensors || {};
+$("tempVal").textContent = (s.temperature ?? "--");
+$("humVal").textContent = (s.humidity ?? "--");
 
-// manual switches page
-setSwitch($("swValve"), !!d.valve);
-setSwitch($("swMotor"), !!d.motor);
+$("soilVal").textContent = ((s.soil ?? "--") + "%");
+$("tankVal").textContent = ((s.tank ?? "--") + "%");
 
-} catch (e) {
-// if backend unreachable, keep UI
-}
-}
+setGauge($("soilRing"), s.soil ?? 0);
+setGauge($("tankRing"), s.tank ?? 0);
 
-async function toggleValve() {
-const newVal = !current.valve;
-await apiPost(API.setValve, { value: newVal });
-await loadData();
-}
+// actuators
+const a = data.actuators || {};
+const motorOn = !!a.motor;
+const valveOn = !!a.valve;
 
-async function toggleMotor() {
-const newVal = !current.motor;
-await apiPost(API.setMotor, { value: newVal });
-await loadData();
-}
+$("motorText").textContent = motorOn ? "ON" : "OFF";
+$("motorText").className = motorOn ? "on" : "off";
 
-// ---------------- Timers UI ----------------
-function formatDT(ts) {
-const d = new Date(ts * 1000);
-return d.toISOString().slice(0,16).replace("T"," ");
+$("valveStatus").textContent = valveOn ? "ON" : "OFF";
+$("valveStatus").style.color = valveOn ? "#20c997" : "#ff3b30";
+
+$("valveSwitch").checked = valveOn;
+$("valveSwitch2").checked = valveOn;
+$("motorSwitch").checked = motorOn;
+
+// settings
+$("backendUrl").textContent = window.location.origin;
+$("cfgHost").textContent = data.config?.MQTT_HOST ?? "--";
+$("cfgPort").textContent = data.config?.MQTT_PORT ?? "--";
+$("cfgData").textContent = data.config?.TOPIC_DATA ?? "--";
+$("cfgCmd").textContent = data.config?.TOPIC_CMD ?? "--";
 }
 
 async function refreshTimers() {
-const box = $("timerList");
-box.innerHTML = "";
-try {
-const res = await apiGet(API.timers);
-for (const t of res.timers) {
+const t = await apiGet("/api/timers");
+const list = $("timerList");
+list.innerHTML = "";
+
+(t.items || []).forEach(item => {
 const div = document.createElement("div");
 div.className = "timerItem";
-const deviceLabel = (t.device === "valve") ? "Valve 1" : "Tank motor";
 div.innerHTML = `
-<div class="meta">
-${deviceLabel}<br/>
-From: ${formatDT(t.start)}<br/>
-To: ${formatDT(t.end)}
-</div>
-<button class="xbtn" title="Delete">×</button>
+<div class="timerText">🧰 ${item.valve}<br>From: ${item.from}<br>To: ${item.to}</div>
+<button class="timerX" title="Delete">✕</button>
 `;
-div.querySelector(".xbtn").onclick = async () => {
-await apiDelete(`${API.timers}/${t.id}`);
+div.querySelector(".timerX").addEventListener("click", async () => {
+await apiDel(`/api/timers/${item.id}`);
 await refreshTimers();
-};
-box.appendChild(div);
-}
-} catch {}
-}
-
-function dtLocalToUnix(dtLocal) {
-// dtLocal: "YYYY-MM-DDTHH:MM"
-const d = new Date(dtLocal);
-return Math.floor(d.getTime() / 1000);
+});
+list.appendChild(div);
+});
 }
 
-async function addTimer() {
-const device = $("timerDevice").value;
-const from = $("timerFrom").value;
-const to = $("timerTo").value;
+// -------------------------
+// Events
+// -------------------------
+document.querySelectorAll(".navBtn").forEach(btn => {
+btn.addEventListener("click", () => setActivePage(btn.dataset.page));
+});
 
-if (!from || !to) {
+document.querySelectorAll(".tab").forEach(tab => {
+tab.addEventListener("click", () => {
+document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+tab.classList.add("active");
+
+const mode = tab.dataset.mode;
+["Manual","Automatic","Smart"].forEach(m => {
+document.getElementById("mode"+m).classList.remove("active");
+});
+
+if (mode === "manual") document.getElementById("modeManual").classList.add("active");
+if (mode === "automatic") document.getElementById("modeAutomatic").classList.add("active");
+if (mode === "smart") document.getElementById("modeSmart").classList.add("active");
+});
+});
+
+// switches
+$("valveSwitch").addEventListener("change", async (e) => {
+await apiPost("/api/actuators/valve", {on: e.target.checked});
+await refreshAll();
+});
+$("valveSwitch2").addEventListener("change", async (e) => {
+await apiPost("/api/actuators/valve", {on: e.target.checked});
+await refreshAll();
+});
+$("motorSwitch").addEventListener("change", async (e) => {
+await apiPost("/api/actuators/motor", {on: e.target.checked});
+await refreshAll();
+});
+
+// buttons
+$("btnRefreshHome").addEventListener("click", async () => {
+await refreshAll();
+});
+$("btnRefreshManual").addEventListener("click", async () => {
+await refreshAll();
+});
+$("btnRefreshSettings").addEventListener("click", async () => {
+await refreshAll();
+});
+
+$("btnAddTimer").addEventListener("click", async () => {
+const valve = $("timerValve").value;
+const fromV = $("timerFrom").value;
+const toV = $("timerTo").value;
+
+if (!fromV || !toV) {
 alert("Choisis From et To");
 return;
 }
-const start = dtLocalToUnix(from);
-const end = dtLocalToUnix(to);
-if (end <= start) {
-alert("To doit être après From");
-return;
-}
+await apiPost("/api/timers", {
+valve,
+from: toDisplayValue(fromV),
+to: toDisplayValue(toV),
+});
 
-await apiPost(API.timers, { device, start, end });
 $("timerFrom").value = "";
 $("timerTo").value = "";
 await refreshTimers();
-}
+});
 
-// ---------------- Smart UI ----------------
-async function loadSmart() {
-try {
-const s = await apiGet(API.smart);
-setSwitch($("swSmart"), !!s.enabled);
-$("soilThreshold").value = s.soil_threshold;
-$("minOn").value = s.min_on_seconds;
-} catch {}
-}
+// init
+(async function init() {
+// default date suggestions
+const now = new Date();
+$("timerFrom").value = toLocalInputValue(now);
+const plus = new Date(now.getTime() + 60*60*1000);
+$("timerTo").value = toLocalInputValue(plus);
 
-async function saveSmart() {
-const enabled = $("swSmart").classList.contains("on");
-const soil_threshold = parseInt($("soilThreshold").value || "30", 10);
-const min_on_seconds = parseInt($("minOn").value || "20", 10);
+await refreshAll();
+await refreshTimers();
 
-await apiPost(API.smart, { enabled, soil_threshold, min_on_seconds });
-alert("Smart saved ✅");
-}
+// auto-refresh (optionnel)
+setInterval(async () => {
+try { await refreshAll(); } catch(e) {}
+}, 5000);
 
-// ---------------- Tabs / Navigation ----------------
-function showPage(page) {
-$("pageHome").classList.add("hidden");
-$("pageIrrigate").classList.add("hidden");
-$("pageSettings").classList.add("hidden");
-
-$("navHome").classList.remove("active");
-$("navIrrigate").classList.remove("active");
-$("navSettings").classList.remove("active");
-
-if (page === "home") { $("pageHome").classList.remove("hidden"); $("navHome").classList.add("active"); }
-if (page === "irrigate") { $("pageIrrigate").classList.remove("hidden"); $("navIrrigate").classList.add("active"); }
-if (page === "settings") { $("pageSettings").classList.remove("hidden"); $("navSettings").classList.add("active"); }
-}
-
-function setTab(tab) {
-$("tabManual").classList.remove("active");
-$("tabAuto").classList.remove("active");
-$("tabSmart").classList.remove("active");
-
-$("manualBox").classList.add("hidden");
-$("autoBox").classList.add("hidden");
-$("smartBox").classList.add("hidden");
-
-if (tab === "manual") {
-$("tabManual").classList.add("active");
-$("manualBox").classList.remove("hidden");
-}
-if (tab === "auto") {
-$("tabAuto").classList.add("active");
-$("autoBox").classList.remove("hidden");
-refreshTimers();
-}
-if (tab === "smart") {
-$("tabSmart").classList.add("active");
-$("smartBox").classList.remove("hidden");
-loadSmart();
-}
-}
-
-// ---------------- PWA Service Worker ----------------
+// PWA service worker
 if ("serviceWorker" in navigator) {
-navigator.serviceWorker.register("/static/service-worker.js")
-.then(() => console.log("SW OK"))
-.catch(e => console.log("SW ERR", e));
+try { await navigator.serviceWorker.register("/static/service-worker.js"); } catch(e) {}
 }
-
-// ---------------- Events ----------------
-$("btnValve").onclick = toggleValve;
-$("btnMotor").onclick = toggleMotor;
-
-$("swValve").onclick = toggleValve;
-$("swMotor").onclick = toggleMotor;
-
-$("addTimerBtn").onclick = addTimer;
-
-$("swSmart").onclick = () => {
-$("swSmart").classList.toggle("on");
-};
-$("saveSmartBtn").onclick = saveSmart;
-
-$("navHome").onclick = () => showPage("home");
-$("navIrrigate").onclick = () => showPage("irrigate");
-$("navSettings").onclick = () => showPage("settings");
-
-$("tabManual").onclick = () => setTab("manual");
-$("tabAuto").onclick = () => setTab("auto");
-$("tabSmart").onclick = () => setTab("smart");
-
-// ---------------- Start loop ----------------
-showPage("home");
-setTab("manual");
-
-loadStatus();
-loadData();
-
-setInterval(loadStatus, 2000);
-setInterval(loadData, 2000);
+})();

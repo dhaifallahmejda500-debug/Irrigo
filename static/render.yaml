@@ -1,22 +1,8 @@
-services:
+ services:
 - type: web
 name: irrigo
 env: python
 plan: free
 buildCommand: pip install -r requirements.txt
-startCommand: uvicorn main:app --host 0.0.0.0 --port 10000
-envVars:
-- key: MQTT_HOST
-value: test.mosquitto.org
-- key: MQTT_PORT
-value: "1883"
-- key: MQTT_TOPIC_DATA
-value: irrigo/data
-- key: MQTT_TOPIC_CMD
-value: irrigo/cmd
-- key: MQTT_USER
-value: ""
-- key: MQTT_PASS
-value: ""
-- key: CORS_ORIGINS
-value: "*"
+startCommand: uvicorn main:app --host=0.0.0.0 --port=10000
+autoDeploy: true

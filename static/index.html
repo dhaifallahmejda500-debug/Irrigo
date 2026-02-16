@@ -2,331 +2,188 @@
 <html lang="fr">
 <head>
 <meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
 <title>Irrigo</title>
 
 <link rel="manifest" href="/static/manifest.json">
-<meta name="theme-color" content="#20c997">
+<meta name="theme-color" content="#22e6a7">
+<link rel="icon" href="/static/icon-192.png">
 
-<style>
-:root{
---bg1:#2c7a2c;
---bg2:#1f9d6c;
---card:#ffffff;
---muted:#6b7280;
---btn:#2f7d32;
---danger:#e74c3c;
---ok:#2ecc71;
---shadow: 0 10px 25px rgba(0,0,0,.15);
---radius:18px;
-font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-}
-body{
-margin:0;
-background: linear-gradient(135deg,var(--bg1),var(--bg2));
-min-height:100vh;
-display:flex;
-justify-content:center;
-align-items:center;
-padding:16px;
-}
-.app{
-width: min(420px, 96vw);
-background: rgba(255,255,255,.12);
-border-radius: 26px;
-padding: 14px 14px 78px;
-box-shadow: var(--shadow);
-position:relative;
-overflow:hidden;
-}
-.header{
-display:flex; flex-direction:column; align-items:center;
-color:white; padding:12px 8px 8px;
-}
-.logo{
-display:flex; gap:10px; align-items:center;
-font-size:34px; font-weight:800; letter-spacing:.5px;
-}
-.badge{
-margin-top:6px;
-padding:6px 14px; border-radius:999px;
-font-size:14px; font-weight:700;
-display:inline-flex; align-items:center; gap:8px;
-background:rgba(0,0,0,.22);
-}
-.dot{ width:10px;height:10px;border-radius:50%; background: var(--danger); }
-.badge.online .dot{ background: var(--ok); }
-.panel{
-background: rgba(255,255,255,.14);
-border-radius: 22px;
-padding: 14px;
-margin-top: 8px;
-}
-.grid{
-display:grid;
-grid-template-columns: 1fr 1fr;
-gap:12px;
-}
-.card{
-background: var(--card);
-border-radius: var(--radius);
-padding: 14px;
-min-height: 84px;
-box-shadow: var(--shadow);
-display:flex; flex-direction:column; justify-content:space-between;
-}
-.label{
-font-size:14px; color: var(--muted); font-weight:700;
-display:flex; align-items:center; gap:8px;
-}
-.value{
-font-size:40px; font-weight:900; color:#1f2937;
-line-height:1;
-}
-.bigCard{
-margin-top:12px;
-background: var(--card);
-border-radius: var(--radius);
-padding: 14px;
-box-shadow: var(--shadow);
-display:flex; flex-direction:column; gap:12px;
-align-items:center;
-}
-.bigRow{
-width:100%;
-display:flex; justify-content:center; align-items:center;
-font-weight:900; color:#1f2937; font-size:22px;
-}
-.btn{
-border:none;
-background: var(--btn);
-color:white;
-padding: 12px 18px;
-border-radius: 14px;
-font-weight:800;
-cursor:pointer;
-width: 180px;
-}
-.btn.secondary{
-background:#0ea5e9;
-}
-.tabs{
-display:flex; gap:10px; justify-content:center; margin-bottom:10px;
-}
-.tab{
-border:none; cursor:pointer;
-padding:10px 14px;
-border-radius:999px;
-background: rgba(255,255,255,.35);
-font-weight:900;
-color:#0f172a;
-min-width:105px;
-}
-.tab.active{ background:#20c997; color:white; }
-.sectionTitle{
-color:white; font-weight:900; font-size:26px;
-margin: 8px 0 12px;
-}
-
-.rowCard{
-background: rgba(255,255,255,.9);
-border-radius: 20px;
-padding: 18px;
-display:flex; align-items:center; justify-content:space-between;
-box-shadow: var(--shadow);
-margin-bottom:12px;
-gap:12px;
-}
-.rowCard .name{
-font-weight:900; font-size:22px; color:#334155;
-}
-.switch{
-width:56px; height:32px;
-background:#cbd5e1;
-border-radius:999px;
-position:relative; cursor:pointer;
-}
-.switch.on{ background:#20c997; }
-.knob{
-width:26px; height:26px;
-background:white; border-radius:50%;
-position:absolute; top:3px; left:3px;
-transition:.2s;
-}
-.switch.on .knob{ left:27px; }
-
-.form{
-background: rgba(255,255,255,.92);
-border-radius: 22px;
-padding: 16px;
-box-shadow: var(--shadow);
-}
-.form label{ font-weight:800; color:#334155; display:block; margin-top:10px; }
-.form select, .form input{
-width:100%; padding:12px; margin-top:6px;
-border-radius:14px; border:1px solid #e5e7eb;
-font-weight:700;
-}
-.timerItem{
-margin-top:12px;
-background: rgba(255,255,255,.92);
-border-radius: 18px;
-padding: 14px;
-display:flex; justify-content:space-between; align-items:center;
-box-shadow: var(--shadow);
-}
-.timerItem .meta{ font-weight:800; color:#334155; }
-.xbtn{
-border:none; background:transparent; font-size:26px; cursor:pointer;
-color:#ef4444; font-weight:900;
-}
-
-.nav{
-position:absolute; left:0; right:0; bottom:0;
-height:66px;
-background: rgba(255,255,255,.92);
-display:flex; justify-content:space-around; align-items:center;
-border-top-left-radius: 26px;
-border-top-right-radius: 26px;
-box-shadow: 0 -10px 25px rgba(0,0,0,.12);
-}
-.nav button{
-border:none; background:transparent; cursor:pointer;
-font-weight:900; color:#334155;
-display:flex; flex-direction:column; align-items:center; gap:4px;
-}
-.nav button.active{ color:#20c997; }
-.small{ font-size:12px; }
-.hidden{ display:none; }
-</style>
+<link rel="stylesheet" href="/static/style.css" />
 </head>
 
 <body>
 <div class="app">
-<div class="header">
-<div class="logo">🌱 <span>Irrigo</span></div>
-<div id="statusBadge" class="badge offline">
-<span class="dot"></span><span id="statusText">Offline</span>
+<header class="topbar">
+<div class="brand">
+<span class="logo">RayTech</span>
+<span class="dot" id="mqttDot" title="MQTT status"></span>
 </div>
-</div>
+</header>
 
 <!-- HOME -->
-<div id="pageHome">
-<div class="panel">
-<div class="grid">
-<div class="card">
-<div class="label">🌡️ Temperature</div>
-<div id="tempVal" class="value">--</div>
+<section id="pageHome" class="page active">
+<div class="card big">
+<div class="grid2">
+<div class="metric green">
+<div class="metricIcon">🌡️</div>
+<div class="metricValue" id="tempVal">--</div>
+<div class="metricLabel">Temperature</div>
 </div>
-<div class="card">
-<div class="label">💧 Humidity</div>
-<div id="humVal" class="value">--</div>
-</div>
-<div class="card">
-<div class="label">🌿 Soil</div>
-<div id="soilVal" class="value">--</div>
-</div>
-<div class="card">
-<div class="label">🛢️ Tank</div>
-<div id="tankVal" class="value">--</div>
+
+<div class="metric cyan">
+<div class="metricIcon">💧</div>
+<div class="metricValue" id="humVal">--</div>
+<div class="metricLabel">Humidity</div>
 </div>
 </div>
 
-<div class="bigCard">
-<div class="bigRow">Valve : <span id="valveText" style="margin-left:10px;">OFF</span></div>
-<button class="btn" id="btnValve">Toggle Valve</button>
-<button class="btn secondary" id="btnMotor">Toggle Tank motor</button>
+<div class="row2">
+<div class="gaugeBlock">
+<div class="gaugeTitle">Soil humidity</div>
+<div class="gauge">
+<div class="gaugeRing" id="soilRing"></div>
+<div class="gaugeText" id="soilVal">--%</div>
 </div>
 </div>
+
+<div class="illus">🌱</div>
 </div>
+
+<div class="row2">
+<div class="gaugeBlock">
+<div class="gaugeTitle">Tank Water level</div>
+<div class="gauge">
+<div class="gaugeRing" id="tankRing"></div>
+<div class="gaugeText" id="tankVal">--%</div>
+</div>
+</div>
+
+<div class="tankText">
+<div class="small">Tank Motor is <span id="motorText" class="off">OFF</span></div>
+<div class="illus">🛢️</div>
+</div>
+</div>
+
+<div class="toggleCard">
+<div class="toggleLeft">
+<div class="status" id="valveStatus">OFF</div>
+<div class="toggleTitle">Valve</div>
+</div>
+<label class="switch">
+<input id="valveSwitch" type="checkbox">
+<span class="slider"></span>
+</label>
+</div>
+
+<button class="btn" id="btnRefreshHome">Refresh</button>
+</div>
+</section>
 
 <!-- IRRIGATE -->
-<div id="pageIrrigate" class="hidden">
-<div class="sectionTitle">Irrigate</div>
-
+<section id="pageIrrigate" class="page">
 <div class="tabs">
-<button class="tab active" id="tabManual">Manuel</button>
-<button class="tab" id="tabAuto">Automatic</button>
-<button class="tab" id="tabSmart">Smart</button>
+<button class="tab" data-mode="manual">Manuel</button>
+<button class="tab active" data-mode="automatic">automatic</button>
+<button class="tab" data-mode="smart">Smart</button>
 </div>
 
+<div class="card big">
 <!-- MANUAL -->
-<div id="manualBox">
-<div class="rowCard">
-<div class="name">Tank motor</div>
-<div id="swMotor" class="switch"><div class="knob"></div></div>
-</div>
-<div class="rowCard">
-<div class="name">Valve 1</div>
-<div id="swValve" class="switch"><div class="knob"></div></div>
-</div>
+<div class="mode" id="modeManual">
+<div class="manualItem">
+<div class="manualIcon">🚰</div>
+<div class="manualTitle">Tank motor</div>
+<label class="switch">
+<input id="motorSwitch" type="checkbox">
+<span class="slider"></span>
+</label>
 </div>
 
-<!-- AUTO -->
-<div id="autoBox" class="hidden">
-<div class="form">
-<label>Device</label>
-<select id="timerDevice">
-<option value="valve">Valve 1</option>
-<option value="motor">Tank motor</option>
+<div class="manualItem">
+<div class="manualIcon">🔧</div>
+<div class="manualTitle">Valve 1</div>
+<label class="switch">
+<input id="valveSwitch2" type="checkbox">
+<span class="slider"></span>
+</label>
+</div>
+
+<button class="btn" id="btnRefreshManual">Refresh</button>
+</div>
+
+<!-- AUTOMATIC -->
+<div class="mode active" id="modeAutomatic">
+<h2 class="h2">Set Timer for Irrigation</h2>
+
+<div class="field">
+<label>Valve</label>
+<select id="timerValve">
+<option>Valve 1</option>
 </select>
+</div>
 
+<div class="field">
 <label>From</label>
-<input id="timerFrom" type="datetime-local"/>
+<input id="timerFrom" type="datetime-local">
+</div>
 
+<div class="field">
 <label>To</label>
-<input id="timerTo" type="datetime-local"/>
-
-<div style="margin-top:14px; display:flex; justify-content:center;">
-<button class="btn" id="addTimerBtn">Add</button>
-</div>
+<input id="timerTo" type="datetime-local">
 </div>
 
-<div class="sectionTitle" style="font-size:22px;">Timer List</div>
-<div id="timerList"></div>
+<button class="btn bigBtn" id="btnAddTimer">Add</button>
+
+<h3 class="h3">Timer List</h3>
+<div id="timerList" class="timerList"></div>
 </div>
 
 <!-- SMART -->
-<div id="smartBox" class="hidden">
-<div class="form">
-<label>Smart enabled</label>
-<div style="display:flex; justify-content:space-between; align-items:center; margin-top:8px;">
-<div style="font-weight:900;">Mode Smart</div>
-<div id="swSmart" class="switch"><div class="knob"></div></div>
-</div>
-
-<label>Soil threshold (%)</label>
-<input id="soilThreshold" type="number" min="0" max="100" value="30"/>
-
-<label>Min ON seconds</label>
-<input id="minOn" type="number" min="5" max="600" value="20"/>
-
-<div style="margin-top:14px; display:flex; justify-content:center;">
-<button class="btn" id="saveSmartBtn">Save</button>
+<div class="mode" id="modeSmart">
+<h2 class="h2">Smart mode</h2>
+<p class="muted">
+Ici tu peux ajouter plus tard: seuil soil, température, règles automatiques…
+</p>
 </div>
 </div>
-</div>
-</div>
+</section>
 
 <!-- SETTINGS -->
-<div id="pageSettings" class="hidden">
-<div class="sectionTitle">Settings</div>
-<div class="form">
-<div style="font-weight:900;">PWA / Offline</div>
-<div style="margin-top:8px;color:#334155;font-weight:700;">
-- Ouvre l’app dans Chrome<br/>
-- Menu ⋮ → <b>Add to Home screen</b><br/>
-- L’app marche offline (cache)
+<section id="pageSettings" class="page">
+<div class="card big">
+<h2 class="h2">Settings</h2>
+<div class="kv">
+<div class="k">Backend</div>
+<div class="v" id="backendUrl">--</div>
 </div>
+<div class="kv">
+<div class="k">MQTT Host</div>
+<div class="v" id="cfgHost">--</div>
 </div>
+<div class="kv">
+<div class="k">MQTT Port</div>
+<div class="v" id="cfgPort">--</div>
+</div>
+<div class="kv">
+<div class="k">Topic data</div>
+<div class="v" id="cfgData">--</div>
+</div>
+<div class="kv">
+<div class="k">Topic cmd</div>
+<div class="v" id="cfgCmd">--</div>
 </div>
 
-<!-- NAV -->
-<div class="nav">
-<button id="navHome" class="active">🏠 <span class="small">Home</span></button>
-<button id="navIrrigate">🛰️ <span class="small">Irrigate</span></button>
-<button id="navSettings">⚙️ <span class="small">Settings</span></button>
+<button class="btn" id="btnRefreshSettings">Refresh</button>
 </div>
+</section>
+
+<!-- Bottom nav -->
+<nav class="bottomNav">
+<button class="navBtn active" data-page="Home">🏠<span>Home</span></button>
+<button class="navBtn" data-page="Irrigate">📡<span>Irrigate</span></button>
+<button class="navBtn" data-page="Settings">⚙️<span>Settings</span></button>
+</nav>
 </div>
 
 <script src="/static/app.js"></script>
